@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -22,26 +23,32 @@ export default function DashboardPage() {
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
                   <div className="bg-white p-6 rounded-lg shadow">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">My Recipes</h3>
-                    <p className="text-gray-600">Manage your personal recipe collection</p>
-                    <button className="mt-4 bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
-                      View Recipes
-                    </button>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Browse Recipes</h3>
+                    <p className="text-gray-600">Explore recipes from our community</p>
+                    <Link
+                      href="/dashboard/recipes"
+                      className="mt-4 bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 inline-block"
+                    >
+                      View All Recipes
+                    </Link>
+                  </div>
+                  
+                  <div className="bg-white p-6 rounded-lg shadow">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">AI Recipe Generator</h3>
+                    <p className="text-gray-600">Create personalized recipes with AI assistance</p>
+                    <Link
+                      href="/dashboard/generate"
+                      className="mt-4 bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 inline-block"
+                    >
+                      Generate Recipe
+                    </Link>
                   </div>
                   
                   <div className="bg-white p-6 rounded-lg shadow">
                     <h3 className="text-lg font-semibold text-gray-900 mb-2">Favorites</h3>
-                    <p className="text-gray-600">Quick access to your favorite recipes</p>
+                    <p className="text-gray-600">Quick access to your saved recipes</p>
                     <button className="mt-4 bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
                       View Favorites
-                    </button>
-                  </div>
-                  
-                  <div className="bg-white p-6 rounded-lg shadow">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">AI Assistant</h3>
-                    <p className="text-gray-600">Get AI-powered recipe suggestions</p>
-                    <button className="mt-4 bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
-                      Ask AI
                     </button>
                   </div>
                 </div>

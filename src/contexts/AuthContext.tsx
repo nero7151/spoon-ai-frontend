@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 
 interface User {
   id: string;
@@ -28,33 +28,29 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const isAuthenticated = !!user;
 
-  // Check for existing token on mount
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      // Validate token with backend
-      validateToken(token);
-    } else {
-      setIsLoading(false);
-    }
-  }, []);
-
-  const validateToken = async (token: string) => {
+  const validateToken = useCallback(async (token: string) => {
     try {
-      const response = await fetch('/api/auth/profile', {
+      console.log('Validating token:', token.substring(0, 20) + '...');
+      
+      const response = await fetch('/api/user/me', {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
       });
 
+      console.log('Token validation response status:', response.status);
+
       if (response.ok) {
         const userData = await response.json();
+        console.log('Token validation successful, user data:', userData);
+        
         setUser({
           id: userData.id.toString(),
           username: userData.username,
           email: userData.email
         });
       } else {
+        console.log('Token validation failed, removing token');
         localStorage.removeItem('token');
       }
     } catch (error) {
@@ -63,11 +59,26 @@ export function AuthProvider({ children }: AuthProviderProps) {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
+
+  // Check for existing token on mount
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    console.log('Checking for existing token on mount:', token ? 'found' : 'not found');
+    
+    if (token) {
+      // Validate token with backend
+      validateToken(token);
+    } else {
+      setIsLoading(false);
+    }
+  }, [validateToken]);
 
   const login = async (username: string, password: string): Promise<boolean> => {
     try {
       setIsLoading(true);
+      console.log('Attempting login with:', { username });
+      
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: {
@@ -76,26 +87,38 @@ export function AuthProvider({ children }: AuthProviderProps) {
         body: JSON.stringify({ username, password }),
       });
 
+      console.log('Login response status:', response.status);
+
       if (response.ok) {
         const data = await response.json();
+        console.log('Login response data:', data);
+        
         localStorage.setItem('token', data.access_token);
         
         // Get user profile
-        const profileResponse = await fetch('/api/auth/profile', {
+        const profileResponse = await fetch('/api/user/me', {
           headers: {
             'Authorization': `Bearer ${data.access_token}`,
           },
         });
 
+        console.log('Profile response status:', profileResponse.status);
+
         if (profileResponse.ok) {
           const userData = await profileResponse.json();
+          console.log('Profile data:', userData);
+          
           setUser({
             id: userData.id.toString(),
             username: userData.username,
             email: userData.email
           });
           return true;
+        } else {
+          console.error('Profile fetch failed');
         }
+      } else {
+        console.error('Login failed with status:', response.status);
       }
       return false;
     } catch (error) {

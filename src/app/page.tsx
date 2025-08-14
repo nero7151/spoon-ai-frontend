@@ -52,16 +52,16 @@ export default function Home() {
         {/* Features Section */}
         <div className="py-16">
           <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
-            Features
+            Why Choose Spoon AI?
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="text-center p-6 bg-white rounded-lg shadow-lg">
               <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl">🤖</span>
               </div>
-              <h3 className="text-xl font-semibold mb-2">AI-Powered Suggestions</h3>
+              <h3 className="text-xl font-semibold mb-2">AI-Powered Recipe Generation</h3>
               <p className="text-gray-600">
-                Get personalized recipe recommendations based on your preferences and dietary needs.
+                Chat with our AI to create personalized recipes based on your preferences, dietary restrictions, and available ingredients.
               </p>
             </div>
             
@@ -69,9 +69,9 @@ export default function Home() {
               <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl">📚</span>
               </div>
-              <h3 className="text-xl font-semibold mb-2">Recipe Management</h3>
+              <h3 className="text-xl font-semibold mb-2">Community Recipe Library</h3>
               <p className="text-gray-600">
-                Organize, save, and categorize your favorite recipes in one convenient place.
+                Browse and discover recipes created by our community, with ratings and reviews to help you find the perfect dish.
               </p>
             </div>
             
@@ -79,13 +79,38 @@ export default function Home() {
               <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl">❤️</span>
               </div>
-              <h3 className="text-xl font-semibold mb-2">Favorites & Collections</h3>
+              <h3 className="text-xl font-semibold mb-2">Save & Organize</h3>
               <p className="text-gray-600">
-                Create custom collections and mark your favorite recipes for quick access.
+                Save your favorite recipes and organize them into collections for easy access whenever you need cooking inspiration.
               </p>
             </div>
           </div>
         </div>
+
+        {/* Call to Action Section */}
+        {!isAuthenticated && (
+          <div className="bg-indigo-600 rounded-2xl p-8 text-center text-white">
+            <h2 className="text-2xl font-bold mb-4">Ready to Get Started?</h2>
+            <p className="text-indigo-100 mb-6 max-w-2xl mx-auto">
+              Join thousands of home cooks who are already using AI to discover amazing recipes. 
+              Create your account and start generating personalized recipes today!
+            </p>
+            <div className="space-x-4">
+              <Link
+                href="/register"
+                className="inline-block bg-white text-indigo-600 font-semibold py-3 px-8 rounded-lg text-lg hover:bg-gray-100 transition-colors"
+              >
+                Sign Up Free
+              </Link>
+              <Link
+                href="/login"
+                className="inline-block border-2 border-white text-white hover:bg-white hover:text-indigo-600 font-semibold py-3 px-8 rounded-lg text-lg transition-colors"
+              >
+                Sign In
+              </Link>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -5,24 +5,64 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function LoginPage() {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState('john-cena'); // 기본값 설정
+  const [password, setPassword] = useState('password'); // 기본값 설정
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   
   const { login } = useAuth();
   const router = useRouter();
 
+  const testDirectAPI = async () => {
+    try {
+      console.log('Testing direct API call...');
+      
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username: 'john-cena', password: 'password' }),
+      });
+      
+      console.log('Direct API response status:', response.status);
+      const data = await response.json();
+      console.log('Direct API response data:', data);
+      
+      if (response.ok && data.access_token) {
+        // Test user profile API
+        const profileResponse = await fetch('/api/user/me', {
+          headers: {
+            'Authorization': `Bearer ${data.access_token}`,
+          },
+        });
+        
+        console.log('Profile API response status:', profileResponse.status);
+        const profileData = await profileResponse.json();
+        console.log('Profile API response data:', profileData);
+      }
+      
+    } catch (error) {
+      console.error('Direct API test error:', error);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setIsLoading(true);
+    
+    console.log('Login form submitted with:', { username, password });
 
     const success = await login(username, password);
     
+    console.log('Login result:', success);
+    
     if (success) {
+      console.log('Login successful, redirecting to dashboard');
       router.push('/dashboard');
     } else {
+      console.log('Login failed, showing error');
       setError('Invalid username or password');
     }
     
@@ -82,9 +122,17 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed mb-2"
             >
               {isLoading ? 'Signing in...' : 'Sign in'}
+            </button>
+            
+            <button
+              type="button"
+              onClick={testDirectAPI}
+              className="group relative w-full flex justify-center py-2 px-4 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            >
+              Test Direct API
             </button>
           </div>
 
