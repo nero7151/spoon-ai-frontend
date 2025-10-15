@@ -59,9 +59,9 @@ export default function DashboardPage() {
                     <p className="text-gray-600">
                       저장한 레시피를 빠르게 확인하세요
                     </p>
-                    <button className="mt-4 bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
+                    <Link href="/dashboard/favorites" className="mt-4 bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 inline-block">
                       View Favorites
-                    </button>
+                    </Link>
                   </div>
                 </div>
               </div>

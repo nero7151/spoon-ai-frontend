@@ -25,6 +25,7 @@ interface Recipe {
 
 export default function RecipesPage() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [savedIds, setSavedIds] = useState<Set<number>>(new Set());
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -34,6 +35,7 @@ export default function RecipesPage() {
 
   useEffect(() => {
     fetchRecipes();
+    fetchSaved();
   }, []);
 
   const fetchRecipes = async () => {
@@ -68,13 +70,33 @@ export default function RecipesPage() {
       });
 
       if (response.ok) {
-        // You could add a toast notification here
-        console.log("Recipe saved successfully");
+        const data = await response.json();
+        setSavedIds((prev) => {
+          const next = new Set(prev);
+          if (data.saved) next.add(recipeId);
+          else next.delete(recipeId);
+          return next;
+        });
       } else {
         console.log("Save recipe endpoint not implemented yet");
       }
     } catch (error) {
       console.error("Error saving recipe:", error);
+    }
+  };
+
+  const fetchSaved = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch("/api/saved-recipe", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setSavedIds(new Set(data.map((s: any) => s.recipe_id)));
+      }
+    } catch (err) {
+      // ignore
     }
   };
 
@@ -237,10 +259,14 @@ export default function RecipesPage() {
                       </h3>
                       <button
                         onClick={() => handleSaveRecipe(recipe.id)}
-                        className="text-gray-400 hover:text-red-500 transition-colors ml-2"
-                        title="Save recipe"
+                        className={`ml-2 transition-colors ${
+                          savedIds.has(recipe.id)
+                            ? 'text-red-500'
+                            : 'text-gray-400 hover:text-red-500'
+                        }`}
+                        title={savedIds.has(recipe.id) ? 'Unsave' : 'Save recipe'}
                       >
-                        ♡
+                        {savedIds.has(recipe.id) ? '❤️' : '♡'}
                       </button>
                     </div>
 

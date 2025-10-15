@@ -61,6 +61,21 @@ export default function RecipeDetailPage() {
   useEffect(() => {
     if (recipeId) {
       fetchRecipe();
+      // fetch saved state for this user
+      (async () => {
+        try {
+          const token = localStorage.getItem("token");
+          const res = await fetch("/api/saved-recipe", {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (res.ok) {
+            const data = await res.json();
+            setIsSaved(data.some((s: any) => s.recipe_id === parseInt(recipeId)));
+          }
+        } catch (err) {
+          // ignore
+        }
+      })();
     }
   }, [recipeId, fetchRecipe]);
 
@@ -78,7 +93,8 @@ export default function RecipeDetailPage() {
       });
 
       if (response.ok) {
-        setIsSaved(true);
+        const data = await response.json();
+        setIsSaved(Boolean(data.saved));
       } else {
         console.log("Save recipe endpoint not implemented yet");
       }
@@ -205,10 +221,9 @@ export default function RecipeDetailPage() {
 
                 <button
                   onClick={handleSaveRecipe}
-                  disabled={isSaved}
                   className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                     isSaved
-                      ? "bg-green-100 text-green-700 cursor-not-allowed"
+                      ? "bg-green-100 text-green-700"
                       : "bg-indigo-600 hover:bg-indigo-700 text-white"
                   }`}
                 >
