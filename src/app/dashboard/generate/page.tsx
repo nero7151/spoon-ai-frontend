@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import ProtectedRoute from '@/components/ProtectedRoute';
-import Link from 'next/link';
+import { useState } from "react";
+import ProtectedRoute from "@/components/ProtectedRoute";
+import Link from "next/link";
 
 interface Message {
   id: string;
@@ -26,13 +26,14 @@ interface Recipe {
 export default function GenerateRecipePage() {
   const [messages, setMessages] = useState<Message[]>([
     {
-      id: '1',
-      content: '안녕하세요! 저는 레시피 생성 챗봇입니다. 원하는 레시피 종류, 식단 선호, 보유 재료, 또는 특별한 요청 사항을 알려주세요.',
+      id: "1",
+      content:
+        "안녕하세요! 저는 레시피 생성 챗봇입니다. 원하는 레시피 종류, 식단 선호, 보유 재료, 또는 특별한 요청 사항을 알려주세요.",
       isUser: false,
       timestamp: new Date(),
-    }
+    },
   ]);
-  const [inputValue, setInputValue] = useState('');
+  const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSendMessage = async () => {
@@ -45,28 +46,28 @@ export default function GenerateRecipePage() {
       timestamp: new Date(),
     };
 
-    setMessages(prev => [...prev, userMessage]);
-    setInputValue('');
+    setMessages((prev) => [...prev, userMessage]);
+    setInputValue("");
     setIsLoading(true);
 
-  // thinkingMessage 를 try/catch 바깥에서 참조할 수 있도록 선언
-  let thinkingMessage: Message | null = null;
+    // thinkingMessage 를 try/catch 바깥에서 참조할 수 있도록 선언
+    let thinkingMessage: Message | null = null;
 
-  try {
+    try {
       // First, create a requirement with the user's message
-      const token = localStorage.getItem('token');
-      
-      const requirementResponse = await fetch('/api/requirement', {
-        method: 'POST',
+      const token = localStorage.getItem("token");
+
+      const requirementResponse = await fetch("/api/requirement", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ content: userMessage.content }),
       });
 
       if (!requirementResponse.ok) {
-        throw new Error('요구사항 생성에 실패했습니다.');
+        throw new Error("요구사항 생성에 실패했습니다.");
       }
 
       const requirement = await requirementResponse.json();
@@ -74,31 +75,34 @@ export default function GenerateRecipePage() {
       // AI 처리 중 메시지 추가 (한국어)
       thinkingMessage = {
         id: (Date.now() + 1).toString(),
-        content: '요구사항을 바탕으로 레시피를 생성 중입니다... 복잡한 레시피는 최대 5분 정도 소요될 수 있습니다.',
+        content:
+          "요구사항을 바탕으로 레시피를 생성 중입니다... 복잡한 레시피는 최대 5분 정도 소요될 수 있습니다.",
         isUser: false,
         timestamp: new Date(),
       };
 
-      setMessages(prev => [...prev, thinkingMessage!]);
+      setMessages((prev) => [...prev, thinkingMessage!]);
 
       // Generate recipe using the requirement ID
-      const recipeResponse = await fetch('/api/recipe/generate', {
-        method: 'POST',
+      const recipeResponse = await fetch("/api/recipe/generate", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ requirement_id: requirement.id }),
       });
 
       if (!recipeResponse.ok) {
         const errorData = await recipeResponse.json().catch(() => ({}));
-        
+
         if (recipeResponse.status === 504) {
-          throw new Error('레시피 생성 시간이 초과되었습니다. 더 간단한 요청으로 다시 시도해 주세요.');
+          throw new Error(
+            "레시피 생성 시간이 초과되었습니다. 더 간단한 요청으로 다시 시도해 주세요.",
+          );
         }
 
-        throw new Error(errorData.error || '레시피 생성에 실패했습니다.');
+        throw new Error(errorData.error || "레시피 생성에 실패했습니다.");
       }
 
       const recipe = await recipeResponse.json();
@@ -111,29 +115,35 @@ export default function GenerateRecipePage() {
         timestamp: new Date(),
       };
 
-      setMessages(prev => prev.filter(msg => msg.id !== thinkingMessage?.id).concat(successMessage));
-
+      setMessages((prev) =>
+        prev
+          .filter((msg) => msg.id !== thinkingMessage?.id)
+          .concat(successMessage),
+      );
     } catch (error) {
-      console.error('Error generating recipe:', error);
-      
+      console.error("Error generating recipe:", error);
+
       const errorMessage: Message = {
         id: (Date.now() + 3).toString(),
-        content: error instanceof Error
-          ? `죄송합니다. ${error.message}`
-          : '죄송합니다. 레시피 생성 중 오류가 발생했습니다. 다른 요청으로 다시 시도해주세요.',
+        content:
+          error instanceof Error
+            ? `죄송합니다. ${error.message}`
+            : "죄송합니다. 레시피 생성 중 오류가 발생했습니다. 다른 요청으로 다시 시도해주세요.",
         isUser: false,
         timestamp: new Date(),
       };
 
       // thinkingMessage가 있었으면 제거하고 에러 메시지 추가
-      setMessages(prev => prev.filter(m => m.id !== thinkingMessage?.id).concat(errorMessage));
+      setMessages((prev) =>
+        prev.filter((m) => m.id !== thinkingMessage?.id).concat(errorMessage),
+      );
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
     }
@@ -147,7 +157,9 @@ export default function GenerateRecipePage() {
           <div className="mb-6">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-3xl font-bold text-gray-900">AI 레시피 생성기</h1>
+                <h1 className="text-3xl font-bold text-gray-900">
+                  AI 레시피 생성기
+                </h1>
                 <p className="text-gray-600 mt-2">
                   AI와 대화하여 맞춤형 레시피를 만들어보세요
                 </p>
@@ -170,25 +182,32 @@ export default function GenerateRecipePage() {
                   {messages.map((message) => (
                     <div
                       key={message.id}
-                      className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}
+                      className={`flex ${message.isUser ? "justify-end" : "justify-start"}`}
                     >
                       <div
                         className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
                           message.isUser
-                            ? 'bg-indigo-600 text-white'
-                            : 'bg-gray-100 text-gray-900'
+                            ? "bg-indigo-600 text-white"
+                            : "bg-gray-100 text-gray-900"
                         }`}
                       >
-                        <div className={`${message.isUser ? 'text-sm' : 'text-sm whitespace-pre-line'}`}>
-                          {message.content.split('\n\n').map((block, i) => (
-                            <p key={i} className={i === 0 ? 'font-medium' : 'mt-2'}>
+                        <div
+                          className={`${message.isUser ? "text-sm" : "text-sm whitespace-pre-line"}`}
+                        >
+                          {message.content.split("\n\n").map((block, i) => (
+                            <p
+                              key={i}
+                              className={i === 0 ? "font-medium" : "mt-2"}
+                            >
                               {block}
                             </p>
                           ))}
                         </div>
-                        <p className={`text-xs mt-1 ${
-                          message.isUser ? 'text-indigo-200' : 'text-gray-500'
-                        }`}>
+                        <p
+                          className={`text-xs mt-1 ${
+                            message.isUser ? "text-indigo-200" : "text-gray-500"
+                          }`}
+                        >
                           {message.timestamp.toLocaleTimeString()}
                         </p>
                       </div>
@@ -200,10 +219,18 @@ export default function GenerateRecipePage() {
                         <div className="flex items-center space-x-2">
                           <div className="animate-pulse flex space-x-1">
                             <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                            <div
+                              className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                              style={{ animationDelay: "0.1s" }}
+                            ></div>
+                            <div
+                              className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                              style={{ animationDelay: "0.2s" }}
+                            ></div>
                           </div>
-                          <span className="text-sm">AI가 레시피를 생성 중입니다...</span>
+                          <span className="text-sm">
+                            AI가 레시피를 생성 중입니다...
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -245,11 +272,11 @@ export default function GenerateRecipePage() {
                 </h3>
                 <div className="space-y-2">
                   {[
-                    '건강한 아침 식사 레시피를 원해요',
-                    '30분 내 완성되는 빠른 저녁 아이디어',
-                    '채식 파스타 레시피',
-                    '특별한 날을 위한 디저트',
-                    '저탄수화물 식단 옵션'
+                    "건강한 아침 식사 레시피를 원해요",
+                    "30분 내 완성되는 빠른 저녁 아이디어",
+                    "채식 파스타 레시피",
+                    "특별한 날을 위한 디저트",
+                    "저탄수화물 식단 옵션",
                   ].map((suggestion, index) => (
                     <button
                       key={index}

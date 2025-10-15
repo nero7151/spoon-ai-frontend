@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
     if (!authorization) {
       return NextResponse.json(
         { error: "Authorization header is required" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
       const errorText = await response.text();
       return NextResponse.json(
         { error: "Recipe generation failed", details: errorText },
-        { status: response.status }
+        { status: response.status },
       );
     }
 
@@ -46,13 +46,13 @@ export async function POST(request: NextRequest) {
           error:
             "Recipe generation timed out. Please try again with a simpler request.",
         },
-        { status: 504 }
+        { status: 504 },
       );
     }
 
     return NextResponse.json(
       { error: "Internal server error during recipe generation" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

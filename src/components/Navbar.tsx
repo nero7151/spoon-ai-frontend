@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useAuth } from '@/contexts/AuthContext';
-import Link from 'next/link';
+import { useAuth } from "@/contexts/AuthContext";
+import Link from "next/link";
 
 export default function Navbar() {
   const { user, logout, isAuthenticated } = useAuth();
@@ -18,7 +18,7 @@ export default function Navbar() {
             <Link href="/" className="flex-shrink-0">
               <h1 className="text-xl font-bold text-gray-800">🥄 Spoon AI</h1>
             </Link>
-            
+
             {isAuthenticated && (
               <div className="hidden md:block ml-10">
                 <div className="flex items-baseline space-x-4">

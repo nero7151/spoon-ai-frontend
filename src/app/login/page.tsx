@@ -1,71 +1,70 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/contexts/AuthContext';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function LoginPage() {
-  const [username, setUsername] = useState('john-cena'); // 기본값 설정
-  const [password, setPassword] = useState('password'); // 기본값 설정
-  const [error, setError] = useState('');
+  const [username, setUsername] = useState("john-cena"); // 기본값 설정
+  const [password, setPassword] = useState("password"); // 기본값 설정
+  const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const { login } = useAuth();
   const router = useRouter();
 
   const testDirectAPI = async () => {
     try {
-      console.log('Testing direct API call...');
-      
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
+      console.log("Testing direct API call...");
+
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({ username: 'john-cena', password: 'password' }),
+        body: JSON.stringify({ username: "john-cena", password: "password" }),
       });
-      
-      console.log('Direct API response status:', response.status);
+
+      console.log("Direct API response status:", response.status);
       const data = await response.json();
-      console.log('Direct API response data:', data);
-      
+      console.log("Direct API response data:", data);
+
       if (response.ok && data.access_token) {
         // Test user profile API
-        const profileResponse = await fetch('/api/user/me', {
+        const profileResponse = await fetch("/api/user/me", {
           headers: {
-            'Authorization': `Bearer ${data.access_token}`,
+            Authorization: `Bearer ${data.access_token}`,
           },
         });
-        
-        console.log('Profile API response status:', profileResponse.status);
+
+        console.log("Profile API response status:", profileResponse.status);
         const profileData = await profileResponse.json();
-        console.log('Profile API response data:', profileData);
+        console.log("Profile API response data:", profileData);
       }
-      
     } catch (error) {
-      console.error('Direct API test error:', error);
+      console.error("Direct API test error:", error);
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setIsLoading(true);
-    
-    console.log('Login form submitted with:', { username, password });
+
+    console.log("Login form submitted with:", { username, password });
 
     const success = await login(username, password);
-    
-    console.log('Login result:', success);
-    
+
+    console.log("Login result:", success);
+
     if (success) {
-      console.log('Login successful, redirecting to dashboard');
-      router.push('/dashboard');
+      console.log("Login successful, redirecting to dashboard");
+      router.push("/dashboard");
     } else {
-      console.log('Login failed, showing error');
-      setError('Invalid username or password');
+      console.log("Login failed, showing error");
+      setError("Invalid username or password");
     }
-    
+
     setIsLoading(false);
   };
 
@@ -124,9 +123,9 @@ export default function LoginPage() {
               disabled={isLoading}
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed mb-2"
             >
-              {isLoading ? '로그인 중...' : '로그인'}
+              {isLoading ? "로그인 중..." : "로그인"}
             </button>
-            
+
             <button
               type="button"
               onClick={testDirectAPI}
@@ -138,8 +137,11 @@ export default function LoginPage() {
 
           <div className="text-center">
             <p className="text-sm text-gray-600">
-              Don&apos;t have an account?{' '}
-              <a href="/register" className="font-medium text-indigo-600 hover:text-indigo-500">
+              Don&apos;t have an account?{" "}
+              <a
+                href="/register"
+                className="font-medium text-indigo-600 hover:text-indigo-500"
+              >
                 회원가입
               </a>
             </p>

@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback } from 'react';
-import ProtectedRoute from '@/components/ProtectedRoute';
-import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useState, useEffect, useCallback } from "react";
+import ProtectedRoute from "@/components/ProtectedRoute";
+import Link from "next/link";
+import { useParams } from "next/navigation";
 
 interface Recipe {
   id: number;
@@ -37,22 +37,22 @@ export default function RecipeDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isSaved, setIsSaved] = useState(false);
-  const [newReview, setNewReview] = useState({ content: '', rating: 5 });
+  const [newReview, setNewReview] = useState({ content: "", rating: 5 });
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
 
   const fetchRecipe = useCallback(async () => {
     try {
       setIsLoading(true);
       const response = await fetch(`/api/recipe/${recipeId}`);
-      
+
       if (!response.ok) {
-        throw new Error('Recipe not found');
+        throw new Error("Recipe not found");
       }
 
       const data = await response.json();
       setRecipe(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
       setIsLoading(false);
     }
@@ -66,13 +66,13 @@ export default function RecipeDetailPage() {
 
   const handleSaveRecipe = async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       // Note: This endpoint may not be implemented yet
-      const response = await fetch('/api/saved-recipe', {
-        method: 'POST',
+      const response = await fetch("/api/saved-recipe", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ recipe_id: parseInt(recipeId) }),
       });
@@ -80,10 +80,10 @@ export default function RecipeDetailPage() {
       if (response.ok) {
         setIsSaved(true);
       } else {
-        console.log('Save recipe endpoint not implemented yet');
+        console.log("Save recipe endpoint not implemented yet");
       }
     } catch (error) {
-      console.error('Error saving recipe:', error);
+      console.error("Error saving recipe:", error);
     }
   };
 
@@ -92,13 +92,13 @@ export default function RecipeDetailPage() {
 
     try {
       setIsSubmittingReview(true);
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       // Note: This endpoint may not be implemented yet
-      const response = await fetch('/api/review', {
-        method: 'POST',
+      const response = await fetch("/api/review", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           recipe_id: parseInt(recipeId),
@@ -108,13 +108,13 @@ export default function RecipeDetailPage() {
       });
 
       if (response.ok) {
-        setNewReview({ content: '', rating: 5 });
+        setNewReview({ content: "", rating: 5 });
         fetchRecipe(); // Refresh to show new review
       } else {
-        console.log('Review endpoint not implemented yet');
+        console.log("Review endpoint not implemented yet");
       }
     } catch (error) {
-      console.error('Error submitting review:', error);
+      console.error("Error submitting review:", error);
     } finally {
       setIsSubmittingReview(false);
     }
@@ -140,7 +140,9 @@ export default function RecipeDetailPage() {
         <div className="min-h-screen bg-gray-50">
           <div className="max-w-4xl mx-auto py-6 px-4">
             <div className="text-center">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">Recipe Not Found</h2>
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                Recipe Not Found
+              </h2>
               <p className="text-gray-600 mb-4">{error}</p>
               <Link
                 href="/dashboard/recipes"
@@ -155,9 +157,11 @@ export default function RecipeDetailPage() {
     );
   }
 
-  const averageRating = recipe.reviews && recipe.reviews.length > 0 
-    ? recipe.reviews.reduce((sum, review) => sum + review.rating, 0) / recipe.reviews.length 
-    : 0;
+  const averageRating =
+    recipe.reviews && recipe.reviews.length > 0
+      ? recipe.reviews.reduce((sum, review) => sum + review.rating, 0) /
+        recipe.reviews.length
+      : 0;
 
   return (
     <ProtectedRoute>
@@ -171,39 +175,44 @@ export default function RecipeDetailPage() {
             >
               ← Back to Recipes
             </Link>
-            
+
             <div className="bg-white rounded-lg shadow-sm border p-6">
               <div className="flex justify-between items-start">
                 <div className="flex-1">
-                  <h1 className="text-3xl font-bold text-gray-900 mb-2">{recipe.title}</h1>
+                  <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                    {recipe.title}
+                  </h1>
                   <div className="flex items-center space-x-4 text-sm text-gray-500 mb-4">
                     <span>By {recipe.user.username}</span>
                     <span>•</span>
                     <span>{recipe.views} views</span>
                     <span>•</span>
-                    <span>{new Date(recipe.created_at).toLocaleDateString()}</span>
+                    <span>
+                      {new Date(recipe.created_at).toLocaleDateString()}
+                    </span>
                     {averageRating > 0 && (
                       <>
                         <span>•</span>
                         <span className="flex items-center">
                           <span className="text-yellow-400 mr-1">★</span>
-                          {averageRating.toFixed(1)} ({recipe.reviews?.length || 0} reviews)
+                          {averageRating.toFixed(1)} (
+                          {recipe.reviews?.length || 0} reviews)
                         </span>
                       </>
                     )}
                   </div>
                 </div>
-                
+
                 <button
                   onClick={handleSaveRecipe}
                   disabled={isSaved}
                   className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                    isSaved 
-                      ? 'bg-green-100 text-green-700 cursor-not-allowed'
-                      : 'bg-indigo-600 hover:bg-indigo-700 text-white'
+                    isSaved
+                      ? "bg-green-100 text-green-700 cursor-not-allowed"
+                      : "bg-indigo-600 hover:bg-indigo-700 text-white"
                   }`}
                 >
-                  {isSaved ? '✓ Saved' : '♡ Save Recipe'}
+                  {isSaved ? "✓ Saved" : "♡ Save Recipe"}
                 </button>
               </div>
             </div>
@@ -215,16 +224,24 @@ export default function RecipeDetailPage() {
               {/* Description */}
               {recipe.description && (
                 <div className="bg-white rounded-lg shadow-sm border p-6">
-                  <h2 className="text-xl font-semibold text-gray-900 mb-4">Description</h2>
-                  <div className="text-gray-700 leading-relaxed whitespace-pre-line">{recipe.description}</div>
+                  <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                    Description
+                  </h2>
+                  <div className="text-gray-700 leading-relaxed whitespace-pre-line">
+                    {recipe.description}
+                  </div>
                 </div>
               )}
 
               {/* Original Requirement */}
               <div className="bg-white rounded-lg shadow-sm border p-6">
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">Original Request</h2>
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                  Original Request
+                </h2>
                 <div className="bg-gray-50 rounded-lg p-4">
-                  <p className="text-gray-700 italic">&ldquo;{recipe.requirement.content}&rdquo;</p>
+                  <p className="text-gray-700 italic">
+                    &ldquo;{recipe.requirement.content}&rdquo;
+                  </p>
                 </div>
               </div>
 
@@ -236,7 +253,9 @@ export default function RecipeDetailPage() {
 
                 {/* Add Review Form */}
                 <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-                  <h3 className="font-medium text-gray-900 mb-3">Write a Review</h3>
+                  <h3 className="font-medium text-gray-900 mb-3">
+                    Write a Review
+                  </h3>
                   <div className="space-y-3">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -244,7 +263,12 @@ export default function RecipeDetailPage() {
                       </label>
                       <select
                         value={newReview.rating}
-                        onChange={(e) => setNewReview(prev => ({ ...prev, rating: parseInt(e.target.value) }))}
+                        onChange={(e) =>
+                          setNewReview((prev) => ({
+                            ...prev,
+                            rating: parseInt(e.target.value),
+                          }))
+                        }
                         className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                       >
                         <option value={5}>⭐⭐⭐⭐⭐ (5 stars)</option>
@@ -260,7 +284,12 @@ export default function RecipeDetailPage() {
                       </label>
                       <textarea
                         value={newReview.content}
-                        onChange={(e) => setNewReview(prev => ({ ...prev, content: e.target.value }))}
+                        onChange={(e) =>
+                          setNewReview((prev) => ({
+                            ...prev,
+                            content: e.target.value,
+                          }))
+                        }
                         placeholder="Share your thoughts about this recipe..."
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         rows={3}
@@ -271,7 +300,7 @@ export default function RecipeDetailPage() {
                       disabled={!newReview.content.trim() || isSubmittingReview}
                       className="bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-300 text-white px-4 py-2 rounded-lg font-medium transition-colors"
                     >
-                      {isSubmittingReview ? 'Submitting...' : 'Submit Review'}
+                      {isSubmittingReview ? "Submitting..." : "Submit Review"}
                     </button>
                   </div>
                 </div>
@@ -284,16 +313,23 @@ export default function RecipeDetailPage() {
                     </p>
                   ) : (
                     recipe.reviews.map((review) => (
-                      <div key={review.id} className="border-b border-gray-200 pb-4">
+                      <div
+                        key={review.id}
+                        className="border-b border-gray-200 pb-4"
+                      >
                         <div className="flex items-center justify-between mb-2">
                           <div className="flex items-center space-x-2">
-                            <span className="font-medium text-gray-900">{review.user.username}</span>
+                            <span className="font-medium text-gray-900">
+                              {review.user.username}
+                            </span>
                             <div className="flex items-center">
                               {[...Array(5)].map((_, i) => (
                                 <span
                                   key={i}
                                   className={`text-sm ${
-                                    i < review.rating ? 'text-yellow-400' : 'text-gray-300'
+                                    i < review.rating
+                                      ? "text-yellow-400"
+                                      : "text-gray-300"
                                   }`}
                                 >
                                   ★
@@ -319,7 +355,9 @@ export default function RecipeDetailPage() {
             <div className="space-y-6">
               {/* Quick Actions */}
               <div className="bg-white rounded-lg shadow-sm border p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                  Quick Actions
+                </h3>
                 <div className="space-y-3">
                   <Link
                     href="/dashboard/generate"
@@ -338,7 +376,9 @@ export default function RecipeDetailPage() {
 
               {/* Recipe Stats */}
               <div className="bg-white rounded-lg shadow-sm border p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Recipe Stats</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                  Recipe Stats
+                </h3>
                 <div className="space-y-3">
                   <div className="flex justify-between">
                     <span className="text-gray-600">Views:</span>
@@ -346,17 +386,23 @@ export default function RecipeDetailPage() {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Reviews:</span>
-                    <span className="font-medium">{recipe.reviews?.length || 0}</span>
+                    <span className="font-medium">
+                      {recipe.reviews?.length || 0}
+                    </span>
                   </div>
                   {averageRating > 0 && (
                     <div className="flex justify-between">
                       <span className="text-gray-600">Avg Rating:</span>
-                      <span className="font-medium">{averageRating.toFixed(1)} ⭐</span>
+                      <span className="font-medium">
+                        {averageRating.toFixed(1)} ⭐
+                      </span>
                     </div>
                   )}
                   <div className="flex justify-between">
                     <span className="text-gray-600">Created:</span>
-                    <span className="font-medium">{new Date(recipe.created_at).toLocaleDateString()}</span>
+                    <span className="font-medium">
+                      {new Date(recipe.created_at).toLocaleDateString()}
+                    </span>
                   </div>
                 </div>
               </div>

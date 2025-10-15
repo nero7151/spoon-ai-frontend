@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import ProtectedRoute from '@/components/ProtectedRoute';
-import Link from 'next/link';
+import { useState, useEffect } from "react";
+import ProtectedRoute from "@/components/ProtectedRoute";
+import Link from "next/link";
 
 interface Recipe {
   id: number;
@@ -18,14 +18,19 @@ interface Recipe {
   requirement: {
     content: string;
   };
+  _count?: {
+    reviews?: number;
+  };
 }
 
 export default function RecipesPage() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [sortBy, setSortBy] = useState<'newest' | 'popular' | 'rating'>('newest');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortBy, setSortBy] = useState<"newest" | "popular" | "rating">(
+    "newest",
+  );
 
   useEffect(() => {
     fetchRecipes();
@@ -34,16 +39,16 @@ export default function RecipesPage() {
   const fetchRecipes = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch('/api/recipe');
-      
+      const response = await fetch("/api/recipe");
+
       if (!response.ok) {
-        throw new Error('Failed to fetch recipes');
+        throw new Error("Failed to fetch recipes");
       }
 
       const data = await response.json();
       setRecipes(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
       setIsLoading(false);
     }
@@ -51,42 +56,54 @@ export default function RecipesPage() {
 
   const handleSaveRecipe = async (recipeId: number) => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       // Note: This endpoint may not be implemented yet
-      const response = await fetch('/api/saved-recipe', {
-        method: 'POST',
+      const response = await fetch("/api/saved-recipe", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ recipe_id: recipeId }),
       });
 
       if (response.ok) {
         // You could add a toast notification here
-        console.log('Recipe saved successfully');
+        console.log("Recipe saved successfully");
       } else {
-        console.log('Save recipe endpoint not implemented yet');
+        console.log("Save recipe endpoint not implemented yet");
       }
     } catch (error) {
-      console.error('Error saving recipe:', error);
+      console.error("Error saving recipe:", error);
     }
   };
 
   const filteredAndSortedRecipes = recipes
-    .filter(recipe => 
-      recipe.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      recipe.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      recipe.requirement.content.toLowerCase().includes(searchTerm.toLowerCase())
+    .filter(
+      (recipe) =>
+        recipe.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        recipe.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        recipe.requirement.content
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase()),
     )
     .sort((a, b) => {
       switch (sortBy) {
-        case 'newest':
-          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-        case 'popular':
+        case "newest":
+          return (
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+          );
+        case "popular":
           return b.views - a.views;
-        case 'rating':
-          return (b.score || 0) - (a.score || 0);
+        case "rating": {
+          // Put rated items first, unrated (no score) after
+          const aHas = typeof a.score === "number";
+          const bHas = typeof b.score === "number";
+          if (aHas && bHas) return (b.score || 0) - (a.score || 0);
+          if (aHas && !bHas) return -1;
+          if (!aHas && bHas) return 1;
+          return 0;
+        }
         default:
           return 0;
       }
@@ -112,7 +129,9 @@ export default function RecipesPage() {
         <div className="min-h-screen bg-gray-50">
           <div className="max-w-7xl mx-auto py-6 px-4">
             <div className="text-center">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">Error Loading Recipes</h2>
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                Error Loading Recipes
+              </h2>
               <p className="text-gray-600 mb-4">{error}</p>
               <button
                 onClick={fetchRecipes}
@@ -135,7 +154,9 @@ export default function RecipesPage() {
           <div className="mb-6">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <h1 className="text-3xl font-bold text-gray-900">All Recipes</h1>
+                <h1 className="text-3xl font-bold text-gray-900">
+                  All Recipes
+                </h1>
                 <p className="text-gray-600 mt-2">
                   Discover and explore recipes from our community
                 </p>
@@ -167,7 +188,9 @@ export default function RecipesPage() {
               <div>
                 <select
                   value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value as 'newest' | 'popular' | 'rating')}
+                  onChange={(e) =>
+                    setSortBy(e.target.value as "newest" | "popular" | "rating")
+                  }
                   className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                 >
                   <option value="newest">Newest First</option>
@@ -184,12 +207,13 @@ export default function RecipesPage() {
               <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-4xl">🍽️</span>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">No Recipes Found</h3>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                No Recipes Found
+              </h3>
               <p className="text-gray-600 mb-6">
-                {searchTerm 
-                  ? "Try adjusting your search terms or filters." 
-                  : "Be the first to create a recipe with our AI generator!"
-                }
+                {searchTerm
+                  ? "Try adjusting your search terms or filters."
+                  : "Be the first to create a recipe with our AI generator!"}
               </p>
               <Link
                 href="/dashboard/generate"
@@ -202,7 +226,10 @@ export default function RecipesPage() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredAndSortedRecipes.map((recipe) => (
-                <div key={recipe.id} className="bg-white rounded-lg shadow-sm border hover:shadow-md transition-shadow">
+                <div
+                  key={recipe.id}
+                  className="bg-white rounded-lg shadow-sm border hover:shadow-md transition-shadow"
+                >
                   <div className="p-6">
                     <div className="flex items-start justify-between mb-3">
                       <h3 className="text-lg font-semibold text-gray-900 line-clamp-2">
@@ -216,7 +243,7 @@ export default function RecipesPage() {
                         ♡
                       </button>
                     </div>
-                    
+
                     {recipe.description && (
                       <div className="text-gray-600 text-sm mb-4 line-clamp-3 whitespace-pre-line">
                         {recipe.description}
@@ -235,8 +262,11 @@ export default function RecipesPage() {
                     <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
                       <span>By {recipe.user.username}</span>
                       <div className="flex items-center space-x-3">
-                        <span>{recipe.views} views</span>
-                        {recipe.score && (
+                        <span>
+                          {recipe.views} views / {recipe._count?.reviews ?? 0}{" "}
+                          reviews
+                        </span>
+                        {typeof recipe.score === "number" && (
                           <span className="flex items-center">
                             <span className="text-yellow-400 mr-1">★</span>
                             {recipe.score.toFixed(1)}
@@ -265,7 +295,8 @@ export default function RecipesPage() {
           {/* Stats */}
           <div className="mt-8 text-center text-gray-500">
             <p>
-              Showing {filteredAndSortedRecipes.length} of {recipes.length} recipes
+              Showing {filteredAndSortedRecipes.length} of {recipes.length}{" "}
+              recipes
             </p>
           </div>
         </div>

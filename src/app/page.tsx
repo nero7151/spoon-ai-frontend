@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
@@ -15,14 +15,15 @@ export default function Home() {
             Spoon AI에 오신 것을 환영합니다
           </h1>
           <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-            AI의 힘으로 좋아하는 레시피를 발견하고, 만들고, 관리하세요.
-            개인화된 요리 도우미로 끝없는 요리 영감을 제공합니다.
+            AI의 힘으로 좋아하는 레시피를 발견하고, 만들고, 관리하세요. 개인화된
+            요리 도우미로 끝없는 요리 영감을 제공합니다.
           </p>
-          
+
           {isAuthenticated ? (
             <div className="space-y-4">
               <p className="text-lg text-gray-700">
-                환영합니다, <span className="font-semibold">{user?.username}</span>님!
+                환영합니다,{" "}
+                <span className="font-semibold">{user?.username}</span>님!
               </p>
               <Link
                 href="/dashboard"
@@ -33,18 +34,18 @@ export default function Home() {
             </div>
           ) : (
             <div className="space-x-4">
-                <Link
-                  href="/login"
-                  className="inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-8 rounded-lg text-lg transition-colors"
-                >
-                  로그인
-                </Link>
-                <Link
-                  href="/register"
-                  className="inline-block border-2 border-indigo-600 text-indigo-600 hover:bg-indigo-600 hover:text-white font-semibold py-3 px-8 rounded-lg text-lg transition-colors"
-                >
-                  회원가입
-                </Link>
+              <Link
+                href="/login"
+                className="inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-8 rounded-lg text-lg transition-colors"
+              >
+                로그인
+              </Link>
+              <Link
+                href="/register"
+                className="inline-block border-2 border-indigo-600 text-indigo-600 hover:bg-indigo-600 hover:text-white font-semibold py-3 px-8 rounded-lg text-lg transition-colors"
+              >
+                회원가입
+              </Link>
             </div>
           )}
         </div>
@@ -59,29 +60,36 @@ export default function Home() {
               <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl">🤖</span>
               </div>
-              <h3 className="text-xl font-semibold mb-2">AI 기반 레시피 생성</h3>
+              <h3 className="text-xl font-semibold mb-2">
+                AI 기반 레시피 생성
+              </h3>
               <p className="text-gray-600">
-                Chat with our AI to create personalized recipes based on your preferences, dietary restrictions, and available ingredients.
+                Chat with our AI to create personalized recipes based on your
+                preferences, dietary restrictions, and available ingredients.
               </p>
             </div>
-            
+
             <div className="text-center p-6 bg-white rounded-lg shadow-lg">
               <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl">📚</span>
               </div>
-              <h3 className="text-xl font-semibold mb-2">커뮤니티 레시피 라이브러리</h3>
+              <h3 className="text-xl font-semibold mb-2">
+                커뮤니티 레시피 라이브러리
+              </h3>
               <p className="text-gray-600">
-                Browse and discover recipes created by our community, with ratings and reviews to help you find the perfect dish.
+                Browse and discover recipes created by our community, with
+                ratings and reviews to help you find the perfect dish.
               </p>
             </div>
-            
+
             <div className="text-center p-6 bg-white rounded-lg shadow-lg">
               <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl">❤️</span>
               </div>
               <h3 className="text-xl font-semibold mb-2">즐겨찾기 및 정리</h3>
               <p className="text-gray-600">
-                Save your favorite recipes and organize them into collections for easy access whenever you need cooking inspiration.
+                Save your favorite recipes and organize them into collections
+                for easy access whenever you need cooking inspiration.
               </p>
             </div>
           </div>
@@ -96,18 +104,18 @@ export default function Home() {
               계정을 생성하고 지금 바로 개인화된 레시피를 만들어 보세요!
             </p>
             <div className="space-x-4">
-                <Link
-                  href="/register"
-                  className="inline-block bg-white text-indigo-600 font-semibold py-3 px-8 rounded-lg text-lg hover:bg-gray-100 transition-colors"
-                >
-                  무료로 회원가입
-                </Link>
-                <Link
-                  href="/login"
-                  className="inline-block border-2 border-white text-white hover:bg-white hover:text-indigo-600 font-semibold py-3 px-8 rounded-lg text-lg transition-colors"
-                >
-                  로그인
-                </Link>
+              <Link
+                href="/register"
+                className="inline-block bg-white text-indigo-600 font-semibold py-3 px-8 rounded-lg text-lg hover:bg-gray-100 transition-colors"
+              >
+                무료로 회원가입
+              </Link>
+              <Link
+                href="/login"
+                className="inline-block border-2 border-white text-white hover:bg-white hover:text-indigo-600 font-semibold py-3 px-8 rounded-lg text-lg transition-colors"
+              >
+                로그인
+              </Link>
             </div>
           </div>
         )}
