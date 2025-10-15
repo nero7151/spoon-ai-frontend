@@ -2,9 +2,11 @@
 
 import { useAuth } from "@/contexts/AuthContext";
 import Link from "next/link";
+import { useState } from "react";
 
 export default function Navbar() {
   const { user, logout, isAuthenticated } = useAuth();
+  const [isOpen, setIsOpen] = useState<boolean>(false);
 
   const handleLogout = () => {
     logout();
@@ -48,15 +50,49 @@ export default function Navbar() {
           <div className="flex items-center space-x-4">
             {isAuthenticated ? (
               <>
-                <span className="text-gray-700 text-sm">
-                  {user?.username}님, 환영합니다!
-                </span>
-                <button
-                  onClick={handleLogout}
-                  className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                <div
+                  className="relative pb-1"
+                  onMouseEnter={() => setIsOpen(true)}
+                  onMouseLeave={() => setIsOpen(false)}
                 >
-                  Logout
-                </button>
+                  <span
+                    className="text-gray-700 text-sm cursor-pointer select-none"
+                    onClick={() => setIsOpen((v) => !v)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                      if (e.key === "Escape") setIsOpen(false);
+                      if (e.key === "Enter") setIsOpen((v) => !v);
+                    }}
+                  >
+                    {user?.username}님, 환영합니다!
+                  </span>
+
+                  {/* Dropdown: visible when isOpen true */}
+                  <div
+                    className={`absolute right-0 top-full w-48 bg-white border rounded-md shadow-lg transition-opacity z-10 ${
+                      isOpen
+                        ? "opacity-100 visible pointer-events-auto"
+                        : "opacity-0 invisible pointer-events-none"
+                    }`}
+                  >
+                    <div className="p-2">
+                      <Link
+                        href="/settings"
+                        className="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded"
+                      >
+                        사용자 설정
+                      </Link>
+                      <button
+                        onClick={handleLogout}
+                        className="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-gray-100 rounded"
+                      >
+                        로그아웃
+                      </button>
+                    </div>
+                    <div className="px-3 py-2 text-xs text-gray-400 border-t">v1.0.0</div>
+                  </div>
+                </div>
               </>
             ) : (
               <div className="space-x-2">

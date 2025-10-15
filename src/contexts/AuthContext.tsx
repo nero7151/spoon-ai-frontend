@@ -21,6 +21,7 @@ interface AuthContextType {
   login: (username: string, password: string) => Promise<boolean>;
   logout: () => void;
   isAuthenticated: boolean;
+  refreshUser?: (token: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -153,6 +154,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     login,
     logout,
     isAuthenticated,
+    refreshUser: validateToken,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
