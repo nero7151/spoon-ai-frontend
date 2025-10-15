@@ -40,7 +40,7 @@ export default function RegisterPage() {
         const data = await response.json();
         setError(data.message || 'Registration failed');
       }
-    } catch (error) {
+    } catch {
       setError('Network error. Please try again.');
     } finally {
       setIsLoading(false);
@@ -52,10 +52,10 @@ export default function RegisterPage() {
       <div className="max-w-md w-full space-y-8">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Create your account
+            회원가입
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            Join Spoon AI and start your culinary journey
+            Spoon AI에 가입하고 요리 여정을 시작하세요
           </p>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
@@ -135,7 +135,7 @@ export default function RegisterPage() {
               disabled={isLoading}
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isLoading ? 'Creating account...' : 'Sign up'}
+              {isLoading ? '가입 중...' : '회원가입'}
             </button>
           </div>
 
@@ -143,7 +143,7 @@ export default function RegisterPage() {
             <p className="text-sm text-gray-600">
               Already have an account?{' '}
               <Link href="/login" className="font-medium text-indigo-600 hover:text-indigo-500">
-                Sign in
+                로그인
               </Link>
             </p>
           </div>

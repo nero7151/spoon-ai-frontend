@@ -74,10 +74,10 @@ export default function LoginPage() {
       <div className="max-w-md w-full space-y-8">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Sign in to your account
+            로그인
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            Welcome to Spoon AI Recipe Site
+            Spoon AI 레시피 사이트에 오신 것을 환영합니다
           </p>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
@@ -124,7 +124,7 @@ export default function LoginPage() {
               disabled={isLoading}
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed mb-2"
             >
-              {isLoading ? 'Signing in...' : 'Sign in'}
+              {isLoading ? '로그인 중...' : '로그인'}
             </button>
             
             <button
@@ -138,9 +138,9 @@ export default function LoginPage() {
 
           <div className="text-center">
             <p className="text-sm text-gray-600">
-              Don't have an account?{' '}
+              Don&apos;t have an account?{' '}
               <a href="/register" className="font-medium text-indigo-600 hover:text-indigo-500">
-                Sign up
+                회원가입
               </a>
             </p>
           </div>

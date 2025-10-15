@@ -26,19 +26,19 @@ export default function Navbar() {
                     href="/dashboard"
                     className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
                   >
-                    Dashboard
+                    대시보드
                   </Link>
                   <Link
                     href="/dashboard/recipes"
                     className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
                   >
-                    Browse Recipes
+                    레시피 목록
                   </Link>
                   <Link
                     href="/dashboard/generate"
                     className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
                   >
-                    Generate Recipe
+                    레시피 생성
                   </Link>
                 </div>
               </div>
@@ -49,7 +49,7 @@ export default function Navbar() {
             {isAuthenticated ? (
               <>
                 <span className="text-gray-700 text-sm">
-                  Welcome, {user?.username}!
+                  {user?.username}님, 환영합니다!
                 </span>
                 <button
                   onClick={handleLogout}
@@ -64,13 +64,13 @@ export default function Navbar() {
                   href="/login"
                   className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
                 >
-                  Login
+                  로그인
                 </Link>
                 <Link
                   href="/register"
                   className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 >
-                  Sign Up
+                  회원가입
                 </Link>
               </div>
             )}
