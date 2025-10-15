@@ -34,7 +34,6 @@ export default function GenerateRecipePage() {
   ]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [generatedRecipe, setGeneratedRecipe] = useState<Recipe | null>(null);
 
   const handleSendMessage = async () => {
     if (!inputValue.trim() || isLoading) return;
@@ -103,12 +102,11 @@ export default function GenerateRecipePage() {
       }
 
       const recipe = await recipeResponse.json();
-      setGeneratedRecipe(recipe);
 
-      // 성공 메시지 (한국어)
+      // 성공 메시지로 레시피 타이틀과 설명을 채팅에 추가 (한국어)
       const successMessage: Message = {
         id: (Date.now() + 2).toString(),
-        content: `레시피를 생성했습니다: "${recipe.title}"! 아래에서 확인하세요.`,
+        content: `${recipe.title}\n\n${recipe.description}`,
         isUser: false,
         timestamp: new Date(),
       };
@@ -181,7 +179,13 @@ export default function GenerateRecipePage() {
                             : 'bg-gray-100 text-gray-900'
                         }`}
                       >
-                        <p className="text-sm">{message.content}</p>
+                        <div className={`${message.isUser ? 'text-sm' : 'text-sm whitespace-pre-line'}`}>
+                          {message.content.split('\n\n').map((block, i) => (
+                            <p key={i} className={i === 0 ? 'font-medium' : 'mt-2'}>
+                              {block}
+                            </p>
+                          ))}
+                        </div>
                         <p className={`text-xs mt-1 ${
                           message.isUser ? 'text-indigo-200' : 'text-gray-500'
                         }`}>
@@ -233,52 +237,9 @@ export default function GenerateRecipePage() {
               </div>
             </div>
 
-            {/* Generated Recipe Display */}
+            {/* Right column: Quick Suggestions 고정 */}
             <div className="lg:col-span-1">
               <div className="bg-white rounded-lg shadow-sm border p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                  생성된 레시피
-                </h3>
-                
-                {generatedRecipe ? (
-                  <div className="space-y-4">
-                    <div>
-                      <h4 className="font-medium text-gray-900">{generatedRecipe.title}</h4>
-                      {generatedRecipe.description && (
-                        <div className="text-sm text-gray-600 mt-2 whitespace-pre-line">{generatedRecipe.description}</div>
-                      )}
-                    </div>
-                    
-                    <div className="flex items-center justify-between text-sm text-gray-500">
-                      <span>작성자: {generatedRecipe.user.username}</span>
-                      {generatedRecipe.score && (
-                        <span>★ {generatedRecipe.score.toFixed(1)}</span>
-                      )}
-                    </div>
-                    
-                    <div className="pt-4 border-t">
-                      <Link
-                        href={`/dashboard/recipes/${generatedRecipe.id}`}
-                        className="block w-full text-center bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-lg text-sm font-medium transition-colors"
-                      >
-                        전체 레시피 보기
-                      </Link>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="text-center text-gray-500">
-                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <span className="text-2xl">🍳</span>
-                    </div>
-                    <p className="text-sm">
-                      대화를 시작하여 첫 레시피를 생성하세요!
-                    </p>
-                  </div>
-                )}
-              </div>
-
-              {/* Quick Suggestions */}
-              <div className="bg-white rounded-lg shadow-sm border p-6 mt-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">
                   빠른 제안
                 </h3>
