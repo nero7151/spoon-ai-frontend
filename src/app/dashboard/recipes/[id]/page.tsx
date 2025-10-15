@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Recipe {
   id: number;
@@ -69,10 +70,10 @@ export default function RecipeDetailPage() {
             headers: { Authorization: `Bearer ${token}` },
           });
           if (res.ok) {
-            const data = await res.json();
-            setIsSaved(data.some((s: any) => s.recipe_id === parseInt(recipeId)));
+            const data: Array<{ recipe_id: number }> = await res.json();
+            setIsSaved(data.some((s) => s.recipe_id === parseInt(recipeId)));
           }
-        } catch (err) {
+        } catch {
           // ignore
         }
       })();
@@ -328,38 +329,7 @@ export default function RecipeDetailPage() {
                     </p>
                   ) : (
                     recipe.reviews.map((review) => (
-                      <div
-                        key={review.id}
-                        className="border-b border-gray-200 pb-4"
-                      >
-                        <div className="flex items-center justify-between mb-2">
-                          <div className="flex items-center space-x-2">
-                            <span className="font-medium text-gray-900">
-                              {review.user.username}
-                            </span>
-                            <div className="flex items-center">
-                              {[...Array(5)].map((_, i) => (
-                                <span
-                                  key={i}
-                                  className={`text-sm ${
-                                    i < review.rating
-                                      ? "text-yellow-400"
-                                      : "text-gray-300"
-                                  }`}
-                                >
-                                  ★
-                                </span>
-                              ))}
-                            </div>
-                          </div>
-                          <span className="text-sm text-gray-500">
-                            {new Date(review.created_at).toLocaleDateString()}
-                          </span>
-                        </div>
-                        {review.content && (
-                          <p className="text-gray-700">{review.content}</p>
-                        )}
-                      </div>
+                      <ReviewItem key={review.id} review={review} onUpdated={() => fetchRecipe()} />
                     ))
                   )}
                 </div>
@@ -426,5 +396,134 @@ export default function RecipeDetailPage() {
         </div>
       </div>
     </ProtectedRoute>
+  );
+}
+
+// ReviewItem component (client-side)
+function ReviewItem({
+  review,
+  onUpdated,
+}: {
+  review: {
+    id: number;
+    content?: string;
+    rating: number;
+    created_at: string;
+    user: { username: string };
+  };
+  onUpdated: () => void;
+}) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [content, setContent] = useState(review.content || '');
+  const [rating, setRating] = useState(review.rating);
+  const [loading, setLoading] = useState(false);
+
+  const { user } = useAuth();
+  const isOwner = user?.username === review.user.username;
+
+  const handleDelete = async () => {
+    if (!confirm('삭제하시겠습니까?')) return;
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('token');
+      const res = await fetch(`/api/review/${review.id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        onUpdated();
+      } else {
+        console.error('Failed to delete review');
+        alert('삭제에 실패했습니다.');
+      }
+    } catch (e) {
+      console.error(e);
+      alert('삭제 중 오류가 발생했습니다.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSave = async () => {
+    if (!content.trim()) return alert('리뷰 내용을 입력하세요.');
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('token');
+      const res = await fetch(`/api/review/${review.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ content, rating }),
+      });
+      if (res.ok) {
+        setIsEditing(false);
+        onUpdated();
+      } else {
+        const err = await res.json().catch(() => ({}));
+        console.error('Failed to update review', err);
+        alert('수정에 실패했습니다.');
+      }
+    } catch (e) {
+      console.error(e);
+      alert('수정 중 오류가 발생했습니다.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="border-b border-gray-200 pb-4">
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center space-x-2">
+          <span className="font-medium text-gray-900">{review.user.username}</span>
+          <div className="flex items-center">
+            {[...Array(5)].map((_, i) => (
+              <span key={i} className={`text-sm ${i < rating ? 'text-yellow-400' : 'text-gray-300'}`}>★</span>
+            ))}
+          </div>
+        </div>
+        <div className="flex items-center space-x-2">
+          <span className="text-sm text-gray-500">{new Date(review.created_at).toLocaleDateString()}</span>
+          {isOwner && (
+            <>
+              <button
+                onClick={() => setIsEditing((s) => !s)}
+                className="text-sm text-indigo-600 hover:underline"
+              >
+                {isEditing ? '취소' : '수정'}
+              </button>
+              <button onClick={handleDelete} className="text-sm text-red-600 hover:underline" disabled={loading}>
+                삭제
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+
+      {isEditing ? (
+        <div className="space-y-2">
+          <select value={rating} onChange={(e) => setRating(parseInt(e.target.value))} className="px-2 py-1 border rounded">
+            <option value={5}>5</option>
+            <option value={4}>4</option>
+            <option value={3}>3</option>
+            <option value={2}>2</option>
+            <option value={1}>1</option>
+          </select>
+          <textarea value={content} onChange={(e) => setContent(e.target.value)} className="w-full p-2 border rounded" rows={3} />
+          <div className="space-x-2">
+            <button onClick={handleSave} className="bg-indigo-600 text-white px-3 py-1 rounded" disabled={loading}>
+              저장
+            </button>
+            <button onClick={() => setIsEditing(false)} className="px-3 py-1 border rounded">
+              취소
+            </button>
+          </div>
+        </div>
+      ) : (
+        review.content && <p className="text-gray-700">{review.content}</p>
+      )}
+    </div>
   );
 }
