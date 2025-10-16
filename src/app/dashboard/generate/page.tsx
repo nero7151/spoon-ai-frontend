@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Link from "next/link";
 
@@ -11,19 +12,10 @@ interface Message {
   timestamp: Date;
 }
 
-interface Recipe {
-  id: number;
-  title: string;
-  description: string;
-  created_at: string;
-  views: number;
-  score?: number;
-  user: {
-    username: string;
-  };
-}
 
 export default function GenerateRecipePage() {
+  const auth = useAuth();
+  const user = auth.user;
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
@@ -55,7 +47,21 @@ export default function GenerateRecipePage() {
 
     try {
       // First, create a requirement with the user's message
+      // If the user has saved preferences, include them so the AI receives pre-requirements
       const token = localStorage.getItem("token");
+
+      let contentToSend = userMessage.content;
+      try {
+        if (user) {
+          const prefKey = `preferences:${user.id}`;
+          const savedPref = localStorage.getItem(prefKey);
+          if (savedPref && savedPref.trim()) {
+            contentToSend = `사전 요구사항:\n${savedPref.trim()}\n\n사용자 요청:\n${userMessage.content}`;
+          }
+        }
+      } catch {
+        // ignore localStorage errors
+      }
 
       const requirementResponse = await fetch("/api/requirement", {
         method: "POST",
@@ -63,7 +69,7 @@ export default function GenerateRecipePage() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ content: userMessage.content }),
+        body: JSON.stringify({ content: contentToSend }),
       });
 
       if (!requirementResponse.ok) {

@@ -249,14 +249,33 @@ export default function RecipeDetailPage() {
                 </div>
               )}
 
-              {/* Original Requirement */}
+              {/* Original Requirement (show only user's original request, not saved preferences) */}
               <div className="bg-white rounded-lg shadow-sm border p-6">
                 <h2 className="text-xl font-semibold text-gray-900 mb-4">
                   Original Request
                 </h2>
                 <div className="bg-gray-50 rounded-lg p-4">
                   <p className="text-gray-700 italic">
-                    &ldquo;{recipe.requirement.content}&rdquo;
+                    &ldquo;
+                    {(() => {
+                      const content = recipe.requirement.content || "";
+                      // If content was sent as: "사전 요구사항:\n...\n\n사용자 요청:\n..."
+                      // extract only the part after '사용자 요청:'
+                      const marker = "사용자 요청:";
+                      if (content.includes(marker)) {
+                        const idx = content.indexOf(marker);
+                        return content.slice(idx + marker.length).trim();
+                      }
+                      // fallback: if it contains the pattern '사전 요구사항:' try to split by double newline
+                      const prefMarker = "사전 요구사항:";
+                      if (content.includes(prefMarker)) {
+                        const parts = content.split(/\n\n+/);
+                        // assume last part is user's request
+                        return parts[parts.length - 1].trim();
+                      }
+                      return content;
+                    })()}
+                    &rdquo;
                   </p>
                 </div>
               </div>

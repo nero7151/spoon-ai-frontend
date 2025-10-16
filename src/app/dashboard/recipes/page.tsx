@@ -4,6 +4,24 @@ import { useState, useEffect } from "react";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Link from "next/link";
 
+// Extract only the user's request portion from a stored requirement content.
+// Supports formats like:
+// "사전 요구사항:\n...\n\n사용자 요청:\n..."
+function extractUserRequest(content: string) {
+  const text = content || "";
+  const marker = "사용자 요청:";
+  if (text.includes(marker)) {
+    const idx = text.indexOf(marker);
+    return text.slice(idx + marker.length).trim();
+  }
+  const prefMarker = "사전 요구사항:";
+  if (text.includes(prefMarker)) {
+    const parts = text.split(/\n\n+/);
+    return parts[parts.length - 1].trim();
+  }
+  return text;
+}
+
 interface Recipe {
   id: number;
   title: string;
@@ -280,9 +298,9 @@ export default function RecipesPage() {
                       <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">
                         Based on requirement:
                       </p>
-                      <p className="text-sm text-gray-700 italic line-clamp-2">
-                        &ldquo;{recipe.requirement.content}&rdquo;
-                      </p>
+                        <p className="text-sm text-gray-700 italic line-clamp-2">
+                          &ldquo;{extractUserRequest(recipe.requirement.content)}&rdquo;
+                        </p>
                     </div>
 
                     <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
